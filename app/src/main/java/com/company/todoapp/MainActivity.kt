@@ -1,10 +1,10 @@
 package com.company.todoapp
 
+import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import androidx.activity.viewModels
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.company.todoapp.adapter.ToDoAdapter
 import com.company.todoapp.databinding.ActivityMainBinding
@@ -23,7 +23,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = ToDoAdapter(emptyList())
+        adapter = ToDoAdapter(emptyList()) { selectedToDo ->
+            viewModel.deleteToDo(selectedToDo)
+            Toast.makeText(this, "Silindi: ${selectedToDo.task}", Toast.LENGTH_SHORT).show()
+        }
+
         binding.toDoRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.toDoRecyclerView.adapter = adapter
 
@@ -31,14 +35,8 @@ class MainActivity : AppCompatActivity() {
             adapter.updateList(it)
         }
 
-        binding.searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(query: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchToDos(query.toString()).observe(this@MainActivity) {
-                    adapter.updateList(it)
-                }
-            }
-        })
+        binding.fabAdd.setOnClickListener {
+            startActivity(Intent(this, AddToDoActivity::class.java)) // 👈 burası şimdi çalışmalı
+        }
     }
 }
